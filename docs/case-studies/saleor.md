@@ -13,7 +13,7 @@ The result is a five-tool checkout capability:
 | `set_checkout_contact`   | Updates guest email and shipping address      |
 | `list_delivery_options`  | Calculates eligible Saleor delivery methods   |
 | `select_delivery_option` | Selects one delivery method                   |
-| `place_order`            | Confirms, pays and creates exactly one order  |
+| `place_order`            | Confirms, pays and recovers one tested order  |
 
 You can [browse the complete integration branch](https://github.com/kartik-hegde/storefront/tree/feat/signett-webmcp-demo).
 It is also maintained as a pinned upstream revision plus a reviewable patch in the
@@ -67,6 +67,16 @@ the same operation key instead of creating a duplicate order with a new key.
 The benchmark's oracle independently queries PostgreSQL and requires exactly one paid
 order with the expected email, line count, amount and currency. The browser response is
 therefore not the grader.
+
+## What this proof does not establish
+
+This integration is a browser-profile experiment, not the final production contract.
+Its approval and oracle bind line count, email, total, and currency, but not exact
+variant identities or the complete delivery address. Its logical operation key is not
+transactionally bound to the Saleor mutation on the server, so it does not establish
+multi-device uniqueness. A production integration must add exact-intent approval,
+server-owned operation binding, durable receipts, and cross-session status lookup as
+described in [execution guarantees](../execution-guarantees).
 
 ## What the integration taught us
 

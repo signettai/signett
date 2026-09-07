@@ -113,6 +113,8 @@ export default defineConfig({
       {
         text: "Project",
         items: [
+          { text: "Design partner program", link: "/design-partners" },
+          { text: "Execution guarantees", link: "/execution-guarantees" },
           { text: "Production checklist", link: "/production-checklist" },
           { text: "Design contract", link: "/design" },
           { text: "Observability spec", link: "/specs/observability" },

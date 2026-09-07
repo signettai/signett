@@ -10,7 +10,7 @@ frozen.
 |   1 | Deferred | Publish a real release         | Publish only after local API and reference integrations settle.                                                                                                       |
 |   2 | Done     | Agent-legible failures         | Field-level capped validation messages and coded tool errors cross the native boundary.                                                                               |
 |   3 | Resolved | Agent arrives after page load  | Native WebMCP owns `modelContext` from document creation; late agents see registered tools. Late extension/polyfill bridges are injected explicitly, without polling. |
-|   4 | Done     | React binding                  | Race-safe `useSignettTool` with status, error state, and explicit closure dependencies.                                                                                |
+|   4 | Done     | React binding                  | Race-safe `useSignettTool` with status, error state, and explicit closure dependencies.                                                                               |
 |   5 | Done     | Confirmation stage             | App-owned confirmation runs after authorization and before idempotency with auditable events.                                                                         |
 |   6 | Done     | Durable idempotency path       | Phased store conformance, a shipped IndexedDB/Web Locks adapter, and a PostgreSQL recipe distinguish live, abandoned, completed, and safely released work.            |
 |   7 | Done     | Completed mutation after abort | A completed handler wins with or without idempotency; verification has an optional independent deadline and the outcome remains observable.                           |
@@ -28,10 +28,11 @@ frozen.
 
 ## Next proof points
 
-| Priority | Status | Work item                         | Exit criterion                                                                                                                                          |
-| -------: | ------ | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|        1 | Next   | Integrate three external websites | Each exposes one read and one consequential workflow with less custom boundary code than raw WebMCP.                                                    |
-|        2 | Next   | Run saved tasks with real agents  | Establish selection, valid-argument, completion, and token baselines across representative tasks.                                                       |
-|        3 | Next   | Harden the Inspector from usage   | Add value capture only if developers request it, and only behind explicit redaction/consent.                                                            |
-|        4 | Next   | Release candidate                 | Freeze the small proven surface, write migration/stability notes, then publish the first alpha.                                                         |
-|        5 | Spec   | Trace observability               | OTLP traces, per-tool latency and error tables, and a Jaeger recipe with no new developer code; see [the observability spec](./specs/observability.md). |
+| Priority | Status | Work item                        | Exit criterion                                                                                                                                          |
+| -------: | ------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|        1 | Done   | Define the design-partner gate   | Publish the target profile, discovery questions, pilot contract, scorecard, guarantees, and exact-intent production recipe.                             |
+|        2 | Next   | Qualify three partner workflows  | Each has a real launch date, accountable owner, authoritative oracle, and one consequential workflow blocked on execution risk.                         |
+|        3 | Next   | Run saved tasks with real agents | Establish selection, valid-argument, completion, and token baselines across representative tasks.                                                       |
+|        4 | Next   | Harden the Inspector from usage  | Add value capture only if developers request it, and only behind explicit redaction/consent.                                                            |
+|        5 | Next   | Release candidate                | Freeze the small proven surface, write migration/stability notes, then publish the first alpha.                                                         |
+|        6 | Spec   | Trace observability              | OTLP traces, per-tool latency and error tables, and a Jaeger recipe with no new developer code; see [the observability spec](./specs/observability.md). |
