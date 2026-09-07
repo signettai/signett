@@ -35,6 +35,7 @@ backend behavior:
 | A lost response is recoverable          | Persist an authoritative receipt before acknowledging success                                                 |
 | A fresh session can reconcile           | Expose authenticated receipt/status lookup independent of browser storage                                     |
 | Stale decisions do not execute          | Enforce optimistic concurrency or another server precondition                                                 |
+| A known rejection remains actionable    | Return an explicit, authoritative `not_applied` result; absence of a receipt is not sufficient                |
 | Verification means business success     | Query authoritative state and compare the exact requested postcondition                                       |
 | Operations are auditable                | Correlate intent, approval evidence, backend effect, and receipt under an application-owned retention policy  |
 

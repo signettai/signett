@@ -3,13 +3,14 @@ import { describe, expect, it, vi } from "vitest";
 import {
   exposeCancellationReceipt,
   exposeCancelOrder,
+  type CancellationExecutionResult,
   type CancellationIntent,
   type CancellationReceipt,
   type CancelOrderDependencies,
   type CancelOrderInput,
   type Order,
 } from "../recipes/production-mutation.js";
-import { assertToolReady, ToolError } from "../src/index.js";
+import { assertToolReady } from "../src/index.js";
 import {
   createWebMcpTestHarness,
   MemoryIdempotencyStore,
@@ -24,51 +25,79 @@ const input: CancelOrderInput = {
 };
 
 function createBackend() {
-  let order: Order = {
-    id: "order-1",
-    accountId: "account-1",
-    status: "open",
-    version: "version-3",
-  };
+  const orders = new Map<string, Order>([
+    [
+      "order-1",
+      {
+        id: "order-1",
+        accountId: "account-1",
+        status: "open",
+        version: "version-3",
+      },
+    ],
+  ]);
+  const receipts = new Map<string, CancellationReceipt>();
+  const failedReceiptReads = new Set<number>();
+  let ambiguousFailures = 0;
   let effects = 0;
   let lostResponses = 0;
-  let receiptReadFailures = 0;
-  const receipts = new Map<string, CancellationReceipt>();
+  let receiptReads = 0;
+  let staleRejections = 0;
 
   const cancelOrder = vi.fn(
-    async (intent: CancelOrderInput): Promise<CancellationReceipt> => {
+    async (intent: CancelOrderInput): Promise<CancellationExecutionResult> => {
+      if (ambiguousFailures > 0) {
+        ambiguousFailures -= 1;
+        throw new Error("The server connection failed without an outcome.");
+      }
+
       const existing = receipts.get(intent.operationId);
       if (existing) {
-        if (
-          existing.orderId !== intent.orderId ||
-          existing.reason !== intent.reason ||
-          existing.approvedVersion !== intent.expectedVersion
-        ) {
-          throw new ToolError({
+        if (!receiptMatchesInput(existing, intent)) {
+          return {
+            status: "rejected",
+            effect: "not_applied",
             code: "operation_id_reused",
             message: "The operation ID is already bound to different intent.",
-            retryable: false,
-          });
+          };
         }
-        return existing;
+        return { status: "committed", receipt: existing };
       }
-      if (order.version !== intent.expectedVersion) {
-        throw new ToolError({
+
+      if (staleRejections > 0) {
+        staleRejections -= 1;
+        return {
+          status: "rejected",
+          effect: "not_applied",
           code: "approved_state_changed",
           message: "The approved order version is stale.",
-          retryable: false,
-        });
+        };
+      }
+
+      const order = orders.get(intent.orderId);
+      if (!order || order.version !== intent.expectedVersion) {
+        return {
+          status: "rejected",
+          effect: "not_applied",
+          code: "approved_state_changed",
+          message: "The approved order version is stale.",
+        };
       }
 
       effects += 1;
-      order = { ...order, status: "cancelled", version: "version-4" };
+      const updated = {
+        ...order,
+        status: "cancelled",
+        version: "version-4",
+      } as const;
+      orders.set(intent.orderId, updated);
       const receipt: CancellationReceipt = {
         operationId: intent.operationId,
         accountId: order.accountId,
         orderId: order.id,
         reason: intent.reason,
         approvedVersion: intent.expectedVersion,
-        resultingVersion: order.version,
+        resultingVersion: updated.version,
         status: "cancelled",
         committedAt: "2026-09-07T12:00:00.000Z",
       };
@@ -77,29 +106,47 @@ function createBackend() {
         lostResponses -= 1;
         throw new Error("The server committed but the response was lost.");
       }
-      return receipt;
+      return { status: "committed", receipt };
     },
   );
 
   return {
+    addOrder(order: Order) {
+      orders.set(order.id, order);
+    },
     cancelOrder,
+    async commit(intent: CancelOrderInput): Promise<CancellationReceipt> {
+      const result = await cancelOrder(intent);
+      if (result.status !== "committed") {
+        throw new Error(`Unable to seed receipt: ${result.code}`);
+      }
+      return result.receipt;
+    },
     effects: () => effects,
-    failNextReceiptReads(count = 1) {
-      receiptReadFailures = count;
+    failNextAmbiguously(count = 1) {
+      ambiguousFailures = count;
     },
-    loseNextResponses(count = 1) {
-      lostResponses = count;
+    failReceiptReadOn(...readNumbers: number[]) {
+      for (const readNumber of readNumbers) failedReceiptReads.add(readNumber);
     },
-    getOrder: async () => order,
+    getOrder: async (orderId: string) => orders.get(orderId) ?? null,
     getReceipt: async (operationId: string) => {
-      if (receiptReadFailures > 0) {
-        receiptReadFailures -= 1;
+      receiptReads += 1;
+      if (failedReceiptReads.delete(receiptReads)) {
         throw new Error("Receipt service temporarily unavailable.");
       }
       return receipts.get(operationId) ?? null;
     },
-    updateOrder(update: Partial<Order>) {
-      order = { ...order, ...update };
+    loseNextResponses(count = 1) {
+      lostResponses = count;
+    },
+    rejectNextAsStale(count = 1) {
+      staleRejections = count;
+    },
+    updateOrder(orderId: string, update: Partial<Order>) {
+      const order = orders.get(orderId);
+      if (!order) throw new Error(`Unknown order ${orderId}`);
+      orders.set(orderId, { ...order, ...update });
     },
   };
 }
@@ -121,12 +168,34 @@ function dependencies(
       accountId: "account-1",
       scopes: ["orders:cancel"],
     }),
-    getOrder: (orderId) =>
-      backend.getOrder().then((order) => (order.id === orderId ? order : null)),
+    getOrder: (orderId) => backend.getOrder(orderId),
     requestApproval: options.approval ?? (async () => true),
     cancelOrder: (intent) => backend.cancelOrder(intent),
     getCancellationReceipt: (operationId) => backend.getReceipt(operationId),
   };
+}
+
+function receiptMatchesInput(
+  receipt: CancellationReceipt,
+  candidate: CancelOrderInput,
+): boolean {
+  return (
+    receipt.operationId === candidate.operationId &&
+    receipt.orderId === candidate.orderId &&
+    receipt.reason === candidate.reason &&
+    receipt.approvedVersion === candidate.expectedVersion
+  );
+}
+
+function operationKey(candidate: CancelOrderInput): string {
+  return JSON.stringify([
+    "cancel:v1",
+    "account-1",
+    candidate.operationId,
+    candidate.orderId,
+    candidate.reason,
+    candidate.expectedVersion,
+  ]);
 }
 
 describe("production mutation recipe", () => {
@@ -167,6 +236,90 @@ describe("production mutation recipe", () => {
     expect(harness.tools()).toEqual([]);
   });
 
+  it("uses unambiguous keys for delimiter-containing intent fields", async () => {
+    const backend = createBackend();
+    const harness = createWebMcpTestHarness();
+    const firstInput: CancelOrderInput = {
+      ...input,
+      operationId: "operation",
+      orderId: "left:right",
+    };
+    const secondInput: CancelOrderInput = {
+      ...input,
+      operationId: "operation:left",
+      orderId: "right",
+    };
+    backend.addOrder({
+      id: firstInput.orderId,
+      accountId: "account-1",
+      status: "open",
+      version: input.expectedVersion,
+    });
+    backend.addOrder({
+      id: secondInput.orderId,
+      accountId: "account-1",
+      status: "open",
+      version: input.expectedVersion,
+    });
+    const registration = await exposeCancelOrder(
+      dependencies(backend, { modelContext: harness.modelContext }),
+    );
+
+    const first = await harness.invoke("cancel_order", firstInput);
+    const second = await harness.invoke("cancel_order", secondInput);
+
+    expect(first).toMatchObject({
+      operationId: "operation",
+      orderId: "left:right",
+    });
+    expect(second).toMatchObject({
+      operationId: "operation:left",
+      orderId: "right",
+    });
+    expect(backend.effects()).toBe(2);
+    registration.dispose();
+  });
+
+  it("rejects a replayed output that differs from the authoritative receipt", async () => {
+    const backend = createBackend();
+    const otherInput: CancelOrderInput = {
+      ...input,
+      operationId: "cancel-order-2",
+      orderId: "order-2",
+    };
+    backend.addOrder({
+      id: otherInput.orderId,
+      accountId: "account-1",
+      status: "open",
+      version: otherInput.expectedVersion,
+    });
+    const wrongReceipt = await backend.commit(input);
+    await backend.commit(otherInput);
+
+    const operationStore = new MemoryIdempotencyStore();
+    const storeOptions = { signal: new AbortController().signal };
+    await operationStore.begin(operationKey(otherInput), storeOptions);
+    await operationStore.complete(
+      operationKey(otherInput),
+      wrongReceipt,
+      storeOptions,
+    );
+
+    const harness = createWebMcpTestHarness();
+    const registration = await exposeCancelOrder(
+      dependencies(backend, {
+        modelContext: harness.modelContext,
+        operationStore,
+      }),
+    );
+
+    await expect(
+      harness.invoke("cancel_order", otherInput),
+    ).rejects.toMatchObject({ code: "verification_failed" });
+    expect(backend.effects()).toBe(2);
+    registration.dispose();
+  });
+
   it("refuses execution when state changes after the approved version", async () => {
     const backend = createBackend();
     const harness = createWebMcpTestHarness();
@@ -174,7 +327,7 @@ describe("production mutation recipe", () => {
       dependencies(backend, {
         modelContext: harness.modelContext,
         approval: async () => {
-          backend.updateOrder({ version: "version-4" });
+          backend.updateOrder(input.orderId, { version: "version-4" });
           return true;
         },
       }),
@@ -185,14 +338,72 @@ describe("production mutation recipe", () => {
     });
     expect(backend.cancelOrder).not.toHaveBeenCalled();
     expect(backend.effects()).toBe(0);
+    registration.dispose();
+  });
 
+  it("reports a server-proven stale rejection without marking the outcome unknown", async () => {
+    const backend = createBackend();
+    backend.rejectNextAsStale();
+    const harness = createWebMcpTestHarness();
+    const registration = await exposeCancelOrder(
+      dependencies(backend, { modelContext: harness.modelContext }),
+    );
+
+    await expect(harness.invoke("cancel_order", input)).rejects.toMatchObject({
+      code: "approved_state_changed",
+    });
+    expect(backend.effects()).toBe(0);
+
+    await expect(harness.invoke("cancel_order", input)).resolves.toMatchObject({
+      operationId: input.operationId,
+      status: "cancelled",
+    });
+    expect(backend.effects()).toBe(1);
+    registration.dispose();
+  });
+
+  it("reports operation-ID reuse as a known conflict", async () => {
+    const backend = createBackend();
+    await backend.commit(input);
+    const conflictingInput: CancelOrderInput = {
+      ...input,
+      reason: "duplicate",
+    };
+    const harness = createWebMcpTestHarness();
+    const registration = await exposeCancelOrder(
+      dependencies(backend, { modelContext: harness.modelContext }),
+    );
+
+    await expect(
+      harness.invoke("cancel_order", conflictingInput),
+    ).rejects.toMatchObject({
+      code: "operation_id_reused",
+      retry: "after_repair",
+    });
+    expect(backend.effects()).toBe(1);
+    registration.dispose();
+  });
+
+  it("keeps arbitrary failures after the effect boundary outcome-unknown", async () => {
+    const backend = createBackend();
+    backend.failNextAmbiguously();
+    const harness = createWebMcpTestHarness();
+    const registration = await exposeCancelOrder(
+      dependencies(backend, { modelContext: harness.modelContext }),
+    );
+
+    await expect(harness.invoke("cancel_order", input)).rejects.toMatchObject({
+      code: "outcome_unknown",
+      retryable: false,
+    });
+    expect(backend.effects()).toBe(0);
     registration.dispose();
   });
 
   it("recovers a durable receipt in a fresh client without repeating the effect", async () => {
     const backend = createBackend();
     backend.loseNextResponses();
-    backend.failNextReceiptReads();
+    backend.failReceiptReadOn(2);
 
     const firstHarness = createWebMcpTestHarness();
     const firstRegistration = await exposeCancelOrder(

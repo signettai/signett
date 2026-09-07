@@ -49,6 +49,8 @@ Use this before shipping an authenticated or state-changing WebMCP tool.
 - [ ] Persist the minimum correlation data needed to reconcile a lost response.
 - [ ] Persist an authoritative receipt and expose authenticated status lookup from a
       fresh client without attempting the effect again.
+- [ ] Represent a definitive server rejection explicitly; never infer non-execution
+      only from a missing receipt.
 - [ ] Keep inputs and outputs out of default telemetry.
 - [ ] Decide how support and users see indeterminate outcomes.
 

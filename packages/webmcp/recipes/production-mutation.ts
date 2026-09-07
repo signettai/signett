@@ -41,6 +41,16 @@ export type CancellationReceipt = {
   committedAt: string;
 };
 
+export type CancellationRejection = {
+  status: "rejected";
+  effect: "not_applied";
+  code: "operation_id_reused" | "approved_state_changed";
+  message: string;
+};
+
+export type CancellationExecutionResult =
+  { status: "committed"; receipt: CancellationReceipt } | CancellationRejection;
+
 type ReceiptStatus =
   | { status: "not_found" }
   | { status: "committed"; receipt: CancellationReceipt };
@@ -59,12 +69,14 @@ export interface CancelOrderDependencies {
   /**
    * The server implementation must atomically bind operationId to the complete
    * cancellation intent and return an existing equal-intent receipt on retry.
-   * Reusing operationId for different intent must fail without another effect.
+   * A known conflict must return `rejected` with `effect: "not_applied"`.
+   * Throw when the outcome is not known; a missing receipt is not proof that the
+   * effect did not occur.
    */
   cancelOrder(
     input: CancelOrderInput,
     options: { accountId: string; signal: AbortSignal },
-  ): Promise<CancellationReceipt>;
+  ): Promise<CancellationExecutionResult>;
   /** Read a durable server-owned receipt; never derive it from browser state. */
   getCancellationReceipt(
     operationId: string,
@@ -119,17 +131,28 @@ export async function exposeCancelOrder(dependencies: CancelOrderDependencies) {
     idempotency: {
       store: dependencies.operationStore,
       key: ({ input, context }) =>
-        [
+        JSON.stringify([
+          "cancel:v1",
           context.accountId,
           input.operationId,
           input.orderId,
           input.reason,
           input.expectedVersion,
-          "cancel:v1",
-        ].join(":"),
+        ]),
     },
     journal: { store: dependencies.operationJournal },
     execute: async (input, { context, operation, signal }) => {
+      const existingReceipt = await dependencies.getCancellationReceipt(
+        input.operationId,
+        { accountId: context.accountId, signal },
+      );
+      if (existingReceipt) {
+        if (matchesRequestedReceipt(existingReceipt, input, context)) {
+          return existingReceipt;
+        }
+        throw operationConflict();
+      }
+
       const order = await dependencies.getOrder(input.orderId, {
         accountId: context.accountId,
         signal,
@@ -175,10 +198,15 @@ export async function exposeCancelOrder(dependencies: CancelOrderDependencies) {
         operationId: input.operationId,
         orderId: input.orderId,
       });
-      return dependencies.cancelOrder(input, {
+      const result = await dependencies.cancelOrder(input, {
         accountId: context.accountId,
         signal,
       });
+      if (result.status === "rejected") {
+        await operation?.remove();
+        throw rejectionError(result);
+      }
+      return result.receipt;
     },
     recover: async ({ input, context, signal }) => {
       const receipt = await dependencies.getCancellationReceipt(
@@ -187,21 +215,17 @@ export async function exposeCancelOrder(dependencies: CancelOrderDependencies) {
       );
       return matchesRequestedReceipt(receipt, input, context)
         ? { recovered: true, output: receipt }
-        : receipt
-          ? {
-              recovered: false,
-              outcome: "unknown",
-              reason:
-                "The operation ID is bound to a different cancellation intent.",
-            }
-          : { recovered: false };
+        : { recovered: false };
     },
-    verify: async ({ input, context, signal }) => {
+    verify: async ({ input, output, context, signal }) => {
       const receipt = await dependencies.getCancellationReceipt(
         input.operationId,
         { accountId: context.accountId, signal },
       );
-      return matchesRequestedReceipt(receipt, input, context);
+      return (
+        matchesRequestedReceipt(receipt, input, context) &&
+        receiptsEqual(output, receipt)
+      );
     },
   });
 }
@@ -277,4 +301,56 @@ function matchesRequestedReceipt(
     receipt.approvedVersion === input.expectedVersion &&
     receipt.status === "cancelled"
   );
+}
+
+function receiptsEqual(
+  left: CancellationReceipt,
+  right: CancellationReceipt,
+): boolean {
+  return (
+    left.operationId === right.operationId &&
+    left.accountId === right.accountId &&
+    left.orderId === right.orderId &&
+    left.reason === right.reason &&
+    left.approvedVersion === right.approvedVersion &&
+    left.resultingVersion === right.resultingVersion &&
+    left.status === right.status &&
+    left.committedAt === right.committedAt
+  );
+}
+
+function operationConflict(): ToolError {
+  return new ToolError({
+    code: "operation_id_reused",
+    message: "The operation ID is already bound to a different intent.",
+    retry: "after_repair",
+    repair: {
+      action: "change_input",
+      instruction:
+        "Choose a new operationId for this intent and request approval again.",
+    },
+  });
+}
+
+function rejectionError(rejection: CancellationRejection): ToolError {
+  if (rejection.code === "operation_id_reused") return operationConflict();
+  return new ToolError({
+    code: rejection.code,
+    message: rejection.message,
+    retry: "after_repair",
+    repair: {
+      steps: [
+        {
+          action: "refresh_state",
+          instruction: "Inspect the current authoritative order version.",
+        },
+        {
+          action: "change_input",
+          instruction:
+            "Use the current version and a new operationId, then request approval again.",
+        },
+      ],
+      update: ["expectedVersion", "operationId"],
+    },
+  });
 }
