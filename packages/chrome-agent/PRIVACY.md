@@ -1,5 +1,7 @@
 # Signett Agent privacy disclosure
 
+The public privacy policy is published at <https://www.signett.ai/privacy>.
+
 Signett Agent has one purpose: let a user inspect and invoke the WebMCP tools exposed by
 the active page through a model provider the user configures.
 

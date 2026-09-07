@@ -37,6 +37,7 @@ export default defineConfig({
       },
       { text: "Resources", link: "/resources" },
       { text: "Benchmarks", link: "/benchmarks" },
+      { text: "Privacy", link: "/privacy" },
     ],
     sidebar: [
       {
@@ -119,6 +120,7 @@ export default defineConfig({
           { text: "Design contract", link: "/design" },
           { text: "Observability spec", link: "/specs/observability" },
           { text: "Ecosystem research", link: "/ecosystem" },
+          { text: "Signett Agent privacy", link: "/privacy" },
           { text: "Product tracker", link: "/pm" },
         ],
       },
