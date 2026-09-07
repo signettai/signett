@@ -48,6 +48,12 @@ Browser idempotency is a presentation-layer control, not a replacement for Saleo
 server security or order semantics. A production multi-device deployment should put
 the logical operation key in a transactional backend store.
 
+The current benchmark approves and verifies line count, email, amount, and currency;
+it does not bind exact variant identities or the complete address. Treat it as evidence
+for browser lifecycle, recovery, and independent-oracle testing—not as a production
+exact-intent or multi-device guarantee. The production mutation recipe demonstrates
+the additional server-owned intent and receipt contract.
+
 ## Run it
 
 From `saleor-platform-signett`:

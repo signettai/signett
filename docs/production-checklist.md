@@ -22,8 +22,14 @@ Use this before shipping an authenticated or state-changing WebMCP tool.
 
 ## Mutations
 
+- [ ] Define the exact intent: every material argument, principal, resource version,
+      expiry, and operation ID.
+- [ ] Generate approval UI from that intent and reject execution when a material
+      precondition changes after approval.
 - [ ] Define a stable, correctly scoped idempotency key.
 - [ ] Coordinate duplicate work atomically in durable storage.
+- [ ] Bind the operation ID to the exact intent on the backend; reject reuse for
+      changed intent.
 - [ ] Pair idempotency with an operation journal that records effect-boundary
       correlation.
 - [ ] Distinguish a live owner from abandoned in-flight work across tabs or processes.
@@ -32,6 +38,7 @@ Use this before shipping an authenticated or state-changing WebMCP tool.
 - [ ] Do not assume cancellation proves that no effect occurred.
 - [ ] Use existing application review or confirmation UX for consequential actions.
 - [ ] Decide whether confirmation applies to every invocation or only a new effect.
+- [ ] Do not register an approval-requiring tool when its approval UI is unavailable.
 - [ ] Set and test a task-focused output byte budget.
 
 ## Concurrency and operations
@@ -40,6 +47,8 @@ Use this before shipping an authenticated or state-changing WebMCP tool.
 - [ ] Prove different keys can execute concurrently.
 - [ ] Define retention and recovery behavior for idempotency records.
 - [ ] Persist the minimum correlation data needed to reconcile a lost response.
+- [ ] Persist an authoritative receipt and expose authenticated status lookup from a
+      fresh client without attempting the effect again.
 - [ ] Keep inputs and outputs out of default telemetry.
 - [ ] Decide how support and users see indeterminate outcomes.
 
@@ -49,11 +58,16 @@ Use this before shipping an authenticated or state-changing WebMCP tool.
 - [ ] Context and policy failures fail closed.
 - [ ] Execution and replay both run verification.
 - [ ] Exact replay does not create a second effect or unwanted confirmation prompt.
+- [ ] Reusing an operation ID with different intent creates no effect.
+- [ ] State changed after approval creates no effect and requires new approval.
 - [ ] Ambiguous recovery produces `outcome_unknown`, never a blind retry.
 - [ ] A reload retry recovers the prior in-flight attempt without repeating its effect.
+- [ ] A fresh browser with no local operation state can retrieve the server receipt.
 - [ ] Application errors preserve their identity.
 - [ ] Telemetry failure cannot break the operation.
 - [ ] Native discovery, invocation, visible state, and cleanup work in each target agent.
 - [ ] Saved representative tasks retain selection, argument, and completion quality.
 
-See [Testing WebMCP actions](./guide/testing) for examples.
+See [Testing WebMCP actions](./guide/testing) for examples and
+[execution guarantees](./execution-guarantees) for the boundary between Signett and
+the application.

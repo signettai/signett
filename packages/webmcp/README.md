@@ -181,6 +181,13 @@ replays. Return `outcome: "unknown"` when the effect may have happened but autho
 reconciliation cannot prove either result; Signett raises `OutcomeUnknownError` and tells
 the caller not to retry under a new key.
 
+For consequential actions, the backend must also bind the operation ID to every
+material intent field and persist a receipt independently of browser state. The
+compile-checked [`production-mutation.ts`](./recipes/production-mutation.ts) recipe
+shows exact-version approval, server-enforced intent binding, authoritative receipt
+verification, and a separate read tool that a fresh session can use to reconcile the
+operation without attempting it again.
+
 ## Test without a model or browser
 
 ```ts
