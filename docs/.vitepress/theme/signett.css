@@ -170,6 +170,38 @@ body {
   background: transparent;
 }
 
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.home-action {
+  border: 1px solid var(--sg-line);
+  border-radius: var(--sg-radius-sm);
+  padding: 11px 16px;
+  color: var(--sg-ink) !important;
+  font: 500 13px/1 var(--sg-sans);
+  text-decoration: none !important;
+}
+
+.home-action:hover {
+  border-color: var(--sg-ink);
+}
+
+.home-action-primary {
+  border-color: var(--sg-ink);
+  color: #ffffff !important;
+  background: var(--sg-ink);
+}
+
+.home-action-primary:hover {
+  background: var(--sg-signal-deep);
+  border-color: var(--sg-signal-deep);
+}
+
 .VPHome {
   padding-bottom: var(--sg-space-24) !important;
 }

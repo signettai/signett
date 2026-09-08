@@ -17,5 +17,10 @@ footer: false
       <p>We built Signett to make it easy for web developers to prepare their websites for the agentic era. It is a small open-source TypeScript library that brings WebMCP together with identity, policy, idempotency, observability, verification, and deterministic testing. Developers can build production-ready tools for agents in less time while keeping application logic and state in their application.</p>
     </div>
     <div class="install-line" aria-label="Install Signett with npm"><span aria-hidden="true">$</span><code>npm install signett</code></div>
+    <div class="home-actions">
+      <a class="home-action home-action-primary" href="./guide/getting-started">Get started</a>
+      <a class="home-action" href="./tutorials/first-agent-call">Make your first agent call</a>
+      <a class="home-action" href="./guide/what-is-signett">What is Signett?</a>
+    </div>
   </div>
 </div>

@@ -29,7 +29,7 @@ export default defineConfig({
   themeConfig: {
     siteTitle: "Signett",
     nav: [
-      { text: "Docs", link: "/guide/what-is-signett" },
+      { text: "Docs", link: "/guide/getting-started" },
       { text: "Tutorials", link: "/tutorials/" },
       {
         text: "Examples",
@@ -43,15 +43,15 @@ export default defineConfig({
       {
         text: "Start",
         items: [
+          { text: "Getting started", link: "/guide/getting-started" },
           { text: "What is Signett?", link: "/guide/what-is-signett" },
           { text: "Why Signett", link: "/guide/why-signett" },
+          { text: "Core concepts", link: "/guide/core-concepts" },
           {
             text: "User jobs workflow",
             link: "/guide/user-jobs-workflow",
           },
-          { text: "Getting started", link: "/guide/getting-started" },
           { text: "Agent-guided docs", link: "/guide/agent-guided-docs" },
-          { text: "Core concepts", link: "/guide/core-concepts" },
           { text: "Production WebMCP", link: "/guide/production-webmcp" },
         ],
       },
