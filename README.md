@@ -4,10 +4,30 @@ Signett makes website capabilities reliable and agent-ready through WebMCP. This
 
 [Read the Signett documentation](https://signett.ai).
 
+## Build something useful in five minutes
+
+Start with a shopping list that people and agents can both use. The standalone
+starter installs the published `signett` package, saves groceries in the browser, and
+includes a sample tool call that needs no API key.
+
+```sh
+npx --yes degit@3.10.1 signettai/signett/fixtures/shopping-list my-list
+cd my-list
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:5173` and click **Run sample tool call**. Milk, eggs, and bread
+appear in the list. Refresh to see that they were saved. The sample uses Signett's
+deterministic test harness; it does not run a model.
+
+[Follow the tutorial](https://www.signett.ai/tutorials/shopping-list) to connect a
+[real Chrome agent](https://chromewebstore.google.com/detail/signett-agent/eehffaaooiogcnfdombifkbflnmnhfbb), change the tools, and test invalid input.
+
 ## Repository map
 
-- `packages/webmcp` — the open-source `signett` SDK
-- `packages/eval` — reusable Cases, adapters, evidence schema, runner, change checks, and the `signett` CLI
+- `packages/webmcp` — the flagship `signett` package, including the SDK and CLI entry point
+- `packages/eval` — reusable Cases, adapters, evidence schema, runner, change checks, and the modular CLI implementation
 - `packages/chrome-agent` — a Chrome side-panel agent for inspecting and invoking the current page's WebMCP tools
 - `fixtures` — applications used for end-to-end validation; the Cypress Real World App intentionally keeps its own Yarn lockfile and is not an npm workspace
 - `benchmarks` — deterministic safety, headless Signett Agent, agent-effectiveness, build-vs-buy, and integration suites
@@ -25,9 +45,10 @@ npm run validate:chrome-agent
 npm run bench:agent:smoke
 ```
 
-The `@signett/eval` package installs one terminal entry point:
+The `signett` package installs the SDK and one terminal entry point:
 
 ```bash
+npm install signett
 npx signett agent --help
 npx signett eval --help
 npx signett check --help

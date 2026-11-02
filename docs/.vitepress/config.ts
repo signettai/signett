@@ -30,6 +30,7 @@ export default defineConfig({
     siteTitle: "Signett",
     nav: [
       { text: "Docs", link: "/guide/what-is-signett" },
+      { text: "Get started", link: "/tutorials/shopping-list" },
       { text: "Tutorials", link: "/tutorials/" },
       {
         text: "Examples",
@@ -58,6 +59,7 @@ export default defineConfig({
       {
         text: "Tutorials",
         items: [
+          { text: "Build a shopping list", link: "/tutorials/shopping-list" },
           { text: "Choose a codelab", link: "/tutorials/" },
           { text: "1. First agent call", link: "/tutorials/first-agent-call" },
           {
@@ -91,6 +93,7 @@ export default defineConfig({
             link: "/guide/application-activity",
           },
           { text: "Developer tooling", link: "/guide/developer-tooling" },
+          { text: "Troubleshooting", link: "/guide/troubleshooting" },
           { text: "Performance", link: "/guide/performance" },
         ],
       },

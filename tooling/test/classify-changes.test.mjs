@@ -51,6 +51,12 @@ test("Chrome agent changes select the deterministic agent lane", () => {
   assert.equal(result.reference, false);
 });
 
+test("the published-package starter selects its docs validation lane", () => {
+  const result = classifyFiles(["fixtures/shopping-list/shopping-list.js"]);
+  assert.equal(result.docs, true);
+  assert.equal(result.reference, false);
+});
+
 test("Signett Agent benchmark changes select the deterministic agent lane", () => {
   const result = classifyFiles(["benchmarks/signett-agent/tasks.mjs"]);
   assert.equal(result.eval, true);

@@ -9,11 +9,42 @@ You decide what agents should be able to do. Signett handles the boundary around
 capabilities: registration, input validation, application context, expected errors,
 safe execution, testing, and observability.
 
+## Build something useful in five minutes
+
+Start with a shopping list that people and agents can both use. The standalone
+starter installs the published `signett` package, saves groceries in the browser, and
+includes a sample tool call that needs no API key.
+
+```sh
+npx --yes degit@3.10.1 signettai/signett/fixtures/shopping-list my-list
+cd my-list
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:5173` and click **Run sample tool call**. Milk, eggs, and bread
+appear in the list. Refresh to see that they were saved. The sample uses Signett's
+deterministic test harness; it does not run a model.
+
+[Follow the tutorial](https://www.signett.ai/tutorials/shopping-list) to connect a
+[real Chrome agent](https://chromewebstore.google.com/detail/signett-agent/eehffaaooiogcnfdombifkbflnmnhfbb), change the tools, and test invalid input.
+
 ## Get started
 
 ```sh
 npm install signett
 ```
+
+The same package includes the `signett` terminal workflows:
+
+```sh
+npx signett agent --help
+npx signett eval --help
+npx signett check --help
+```
+
+Evaluation APIs are available from `signett/eval`, and headless agent APIs are
+available from `signett/agent`.
 
 Expose one function from browser code:
 

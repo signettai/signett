@@ -1,0 +1,296 @@
+* {
+  box-sizing: border-box;
+}
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #24352b;
+  background: #f6f5ef;
+  font-synthesis: none;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1080px;
+  margin: auto;
+  padding: 0 36px;
+}
+a {
+  color: inherit;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 0;
+  border-bottom: 1px solid #dedfd5;
+  font-size: 13px;
+}
+header a {
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+}
+header span,
+.small,
+.storage-note,
+footer {
+  color: #697469;
+}
+.intro {
+  padding: 50px 0 30px;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: #65755c;
+}
+h1 {
+  font-size: clamp(42px, 6vw, 66px);
+  line-height: 1.05;
+  letter-spacing: -0.055em;
+  font-weight: 550;
+  margin: 20px 0;
+}
+p {
+  line-height: 1.6;
+}
+.intro > p:last-child {
+  color: #637063;
+  font-size: 16px;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+.card {
+  background: #fffefa;
+  border: 1px solid #dedfd5;
+  border-radius: 18px;
+  padding: 28px;
+}
+.card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+h2 {
+  font-size: 23px;
+  letter-spacing: -0.03em;
+  margin: 0;
+  font-weight: 600;
+}
+#count {
+  font-size: 12px;
+  border-radius: 99px;
+  padding: 7px 10px;
+  background: #eef1e6;
+  white-space: nowrap;
+}
+form {
+  display: flex;
+  gap: 8px;
+}
+input[type="text"],
+input:not([type]) {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #d2d8ca;
+  border-radius: 8px;
+  padding: 12px;
+  font: inherit;
+  background: white;
+}
+button,
+.button-link {
+  font: inherit;
+  border-radius: 8px;
+  border: 1px solid #ced6c6;
+  padding: 11px 17px;
+  cursor: pointer;
+  color: #294a31;
+  background: #edf1e7;
+  font-weight: 600;
+}
+button:hover,
+.button-link:hover {
+  filter: brightness(0.96);
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+:focus-visible {
+  outline: 3px solid #84a65f;
+  outline-offset: 3px;
+}
+#empty {
+  text-align: center;
+  color: #8a9186;
+  padding: 46px 0;
+  font-size: 14px;
+}
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #eef0e8;
+  padding: 9px 0;
+}
+li label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+input[type="checkbox"] {
+  accent-color: #376443;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+input:checked + span {
+  text-decoration: line-through;
+  color: #8a9186;
+}
+.remove {
+  border: 0;
+  background: none;
+  color: #7b867a;
+  font-size: 23px;
+  padding: 4px 10px;
+}
+.storage-note {
+  font-size: 11px;
+  margin-top: 25px;
+}
+.tool-card {
+  background: #eaf0e1;
+  border-color: #d6dfcb;
+}
+.tool-card h2 {
+  font-size: 30px;
+  margin: 14px 0;
+}
+.tool-card > p:not(.eyebrow) {
+  font-size: 14px;
+}
+pre {
+  background: #f5f7ef;
+  border: 1px solid #d6dfcb;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+.primary {
+  width: 100%;
+  background: #294d34;
+  color: white;
+  border: 0;
+  text-align: left;
+  margin-top: 6px;
+}
+.primary span {
+  float: right;
+}
+.tool-card .small {
+  font-size: 11px !important;
+}
+#call-status {
+  font-weight: 600;
+  font-size: 12px !important;
+}
+details {
+  font-size: 12px;
+  margin-top: 18px;
+}
+summary {
+  cursor: pointer;
+}
+#trace {
+  max-height: 240px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+#error {
+  color: #a12b22;
+}
+.next-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 34px 0;
+  padding: 24px 0;
+  border-top: 1px solid #dedfd5;
+}
+.next-step h2 {
+  font-size: 18px;
+}
+.next-step p:last-child {
+  max-width: 610px;
+  font-size: 12px;
+  color: #697469;
+}
+.button-link {
+  white-space: nowrap;
+  text-decoration: none;
+  font-size: 13px;
+}
+footer {
+  border-top: 1px solid #dedfd5;
+  display: flex;
+  justify-content: space-between;
+  padding: 24px 0;
+  font-size: 11px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 720px) {
+  main {
+    padding: 0 20px;
+  }
+  .intro {
+    padding-top: 32px;
+  }
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 23px;
+  }
+  .next-step {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .wide {
+    display: none;
+  }
+  header span {
+    font-size: 11px;
+  }
+  footer {
+    gap: 18px;
+  }
+}

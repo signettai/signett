@@ -27,6 +27,27 @@ interface GuideStep {
 
 const docs: readonly DocEntry[] = [
   {
+    path: "/tutorials/shopping-list",
+    title: "Build an agent-ready shopping list",
+    summary:
+      "Install a useful starter and verify a saved list without model credentials.",
+    keywords: [
+      "shopping",
+      "groceries",
+      "starter",
+      "install",
+      "example",
+      "quickstart",
+    ],
+  },
+  {
+    path: "/guide/troubleshooting",
+    title: "Troubleshooting",
+    summary:
+      "Resolve unsupported browsers, invisible tools, server rendering, and CLI installation.",
+    keywords: ["troubleshoot", "unsupported", "missing", "cli", "ssr", "debug"],
+  },
+  {
     path: "/guide/why-signett",
     title: "Why Signett",
     summary: "Decide when Signett adds value beyond raw WebMCP.",
@@ -125,7 +146,8 @@ const docs: readonly DocEntry[] = [
   {
     path: "/reference/interface",
     title: "Interface reference",
-    summary: "Look up createSignett, expose, tool definitions, and registration.",
+    summary:
+      "Look up createSignett, expose, tool definitions, and registration.",
     keywords: ["api", "interface", "createSignett", "expose", "reference"],
   },
   {
@@ -141,24 +163,29 @@ const guides: Readonly<Record<DeveloperObjective, readonly GuideStep[]>> = {
     {
       path: "/guide/user-jobs-workflow",
       reason: "Start with one user outcome instead of a broad API surface.",
-      doneWhen: "You can name the job, its user, and its authoritative success signal.",
+      doneWhen:
+        "You can name the job, its user, and its authoritative success signal.",
     },
     {
       path: "/guide/why-signett",
-      reason: "Check whether the job needs Signett or only a small raw WebMCP tool.",
+      reason:
+        "Check whether the job needs Signett or only a small raw WebMCP tool.",
       doneWhen: "You can explain why the dependency earns its place.",
     },
     {
       path: "/guide/core-concepts",
-      reason: "Map the chosen job to a tool boundary and application-owned logic.",
-      doneWhen: "The proposed input, output, lifecycle, and state owner are clear.",
+      reason:
+        "Map the chosen job to a tool boundary and application-owned logic.",
+      doneWhen:
+        "The proposed input, output, lifecycle, and state owner are clear.",
     },
   ],
   "add-first-tool": [
     {
       path: "/guide/getting-started",
       reason: "Install Signett and expose one read-only function.",
-      doneWhen: "The registration reports registered in a WebMCP-enabled browser.",
+      doneWhen:
+        "The registration reports registered in a WebMCP-enabled browser.",
     },
     {
       path: "/tutorials/first-agent-call",
@@ -191,8 +218,10 @@ const guides: Readonly<Record<DeveloperObjective, readonly GuideStep[]>> = {
   "harden-production-action": [
     {
       path: "/guide/production-webmcp",
-      reason: "Identify the controls required by the action's consequence level.",
-      doneWhen: "The trust boundary and authoritative state owner are explicit.",
+      reason:
+        "Identify the controls required by the action's consequence level.",
+      doneWhen:
+        "The trust boundary and authoritative state owner are explicit.",
     },
     {
       path: "/guide/authorization",
@@ -218,13 +247,15 @@ const guides: Readonly<Record<DeveloperObjective, readonly GuideStep[]>> = {
   "integrate-existing-app": [
     {
       path: "/guide/user-jobs-workflow",
-      reason: "Choose one existing application outcome as the integration seam.",
+      reason:
+        "Choose one existing application outcome as the integration seam.",
       doneWhen: "The smallest useful capability has been selected.",
     },
     {
       path: "/guide/integration-patterns",
       reason: "Reuse patterns proven in real application integrations.",
-      doneWhen: "The tool calls existing business logic instead of duplicating it.",
+      doneWhen:
+        "The tool calls existing business logic instead of duplicating it.",
     },
     {
       path: "/guide/application-activity",
@@ -239,13 +270,15 @@ const guides: Readonly<Record<DeveloperObjective, readonly GuideStep[]>> = {
   ],
   "troubleshoot-integration": [
     {
-      path: "/guide/developer-tooling",
-      reason: "Separate browser support, registration, selection, and execution failures.",
+      path: "/guide/troubleshooting",
+      reason:
+        "Separate browser support, registration, selection, and execution failures.",
       doneWhen: "You know which layer owns the failure.",
     },
     {
       path: "/reference/errors",
-      reason: "Check whether the failure should be modeled as an expected tool error.",
+      reason:
+        "Check whether the failure should be modeled as an expected tool error.",
       doneWhen: "The agent receives a stable code and safe repair guidance.",
     },
     {
@@ -280,7 +313,11 @@ function searchDocs(query: string, limit: number): readonly DocEntry[] {
       let score = title.includes(normalizedQuery) ? 12 : 0;
       for (const token of queryTokens) {
         if (title.includes(token)) score += 5;
-        if (entry.keywords.some((keyword) => keyword.toLowerCase().includes(token))) {
+        if (
+          entry.keywords.some((keyword) =>
+            keyword.toLowerCase().includes(token),
+          )
+        ) {
           score += 3;
         }
         if (searchable.includes(token)) score += 1;
@@ -311,7 +348,9 @@ export async function registerDocsWebMcp(
   const base = options.base ?? "/";
   const origin =
     options.origin ??
-    (typeof window === "undefined" ? "https://signett.ai" : window.location.origin);
+    (typeof window === "undefined"
+      ? "https://signett.ai"
+      : window.location.origin);
   const urlFor = (path: string): string =>
     new URL(joinBase(base, path), origin).href;
   const currentPage = (): string =>
@@ -373,7 +412,8 @@ export async function registerDocsWebMcp(
             : "Register tools from client-side code and dispose them when the capability is no longer available.",
         steps: guides[objective].map((step, index) => {
           const doc = docsByPath.get(step.path);
-          if (!doc) throw new Error(`Missing documentation entry for ${step.path}.`);
+          if (!doc)
+            throw new Error(`Missing documentation entry for ${step.path}.`);
           return {
             order: index + 1,
             title: doc.title,

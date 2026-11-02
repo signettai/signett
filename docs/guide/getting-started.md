@@ -1,7 +1,9 @@
 # Getting started
 
 Signett makes a function in your website discoverable and callable by browser agents
-through native WebMCP. A tool can be as small as a function that returns a greeting.
+through native WebMCP. Start with a [useful shopping list](../tutorials/shopping-list): install the starter,
+add groceries through a tool, and see the saved result. No model credentials are needed
+for its sample call. The guide below shows how to add a tool to an existing app.
 
 If you are deciding what your application should expose, start with the
 [User Jobs to Be Done workflow](./user-jobs-workflow). It takes one existing product
@@ -23,21 +25,19 @@ website unchanged and reports the tool as `unsupported`.
 npm install signett
 ```
 
-That is the only runtime package required to expose tools. Install `webmcp-types`
-separately only when application code accesses the native `document.modelContext` API
-directly.
-
-To test those tools from a terminal, add the evaluation package as a development
-dependency. Its scoped package installs the `signett` executable:
+That package exposes tools and installs the `signett` executable for terminal tests.
+Install `webmcp-types` separately only when application code accesses the native
+`document.modelContext` API directly.
 
 ```sh
-npm install --save-dev @signett/eval
 npx signett agent --help
 ```
 
-`signett` alone does not install the CLI, and the interactive Chrome extension
-is distributed separately. See [test a WebMCP job from the terminal](../tutorials/headless-agent-testing)
-for the complete workflow.
+[Install Signett Agent for Chrome](https://chromewebstore.google.com/detail/signett-agent/eehffaaooiogcnfdombifkbflnmnhfbb) to try tools interactively.
+No separate `@signett/eval` installation is needed; the public evaluation imports are
+`signett/eval` and `signett/agent`. See
+[test a WebMCP job from the terminal](../tutorials/headless-agent-testing) for the
+complete workflow.
 
 ## Expose one tool
 
@@ -97,6 +97,17 @@ Signett does not poll for a bridge that may appear later. If an extension or tes
 environment provides a `modelContext`, wait for it and pass it explicitly to
 `createSignett({ modelContext })`.
 
+## Server-side rendering
+
+Signett is safe to import where there is no `document`. Without a supplied browser
+boundary, `await createSignett().expose(tool)` resolves to an `unsupported` registration that can
+still be disposed. A server render does not publish browser tools.
+
+In Next.js or Remix, register in client code once the page is mounted, and dispose
+when it unmounts. Use `useSignettTool` from `signett/react` for React lifecycle
+management. A top-level call during a server render does not become a browser
+registration automatically.
+
 ## Test it without a browser agent
 
 The test harness supplies the same registration boundary and lets a test invoke the
@@ -150,3 +161,5 @@ application code. To run this example as a website and let an agent invoke it, f
 the [first agent call codelab](../tutorials/first-agent-call). To turn prompts into a
 repeatable regression suite, continue to
 [headless agent testing](../tutorials/headless-agent-testing).
+
+If registration or discovery fails, use the [troubleshooting guide](./troubleshooting).

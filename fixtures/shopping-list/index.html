@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f5ef" />
+    <title>Shopping list · Signett starter</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a href="https://www.signett.ai">SIGNETT</a
+        ><span>A small, useful starter</span>
+      </header>
+      <section class="intro">
+        <p class="eyebrow">FROM WEBSITE TO AGENT TOOL</p>
+        <h1>Your list.<br />Now agent-ready.</h1>
+        <p>
+          Add groceries by hand or through a tool. Both use the same app
+          logic.<br class="wide" />
+          Your list stays in this browser after you refresh.
+        </p>
+      </section>
+      <div class="workspace">
+        <section class="card list-card" aria-labelledby="list-heading">
+          <div class="card-heading">
+            <h2 id="list-heading">Shopping list</h2>
+            <span id="count">0 to buy</span>
+          </div>
+          <form id="add-form">
+            <label class="sr-only" for="item-name">Grocery name</label>
+            <input
+              id="item-name"
+              name="item"
+              placeholder="What do you need?"
+              maxlength="60"
+              required
+              autocomplete="off"
+            />
+            <button type="submit">Add</button>
+          </form>
+          <p id="empty">
+            A little less to remember.<br />Add your first grocery or try the
+            sample call.
+          </p>
+          <ul id="items" aria-label="Groceries"></ul>
+          <p class="storage-note">Saved on this device · No account needed</p>
+        </section>
+        <section class="card tool-card" aria-labelledby="tool-heading">
+          <p class="eyebrow">TRY THE TOOL</p>
+          <h2 id="tool-heading">Three groceries.<br />One call.</h2>
+          <p>
+            The sample sends structured input through Signett, updates your real
+            list, and verifies the saved result.
+          </p>
+          <pre><code>add_groceries({
+  items: ["Milk", "Eggs", "Bread"]
+})</code></pre>
+          <button id="sample" class="primary" type="button">
+            Run sample tool call <span aria-hidden="true">→</span>
+          </button>
+          <p class="small">
+            A deterministic test call. No AI, API key, or browser flag required.
+          </p>
+          <p id="call-status" role="status" aria-live="polite"></p>
+          <details>
+            <summary>See the last tool call</summary>
+            <pre id="trace">
+Run the sample to see input, output, and execution stages.</pre>
+          </details>
+        </section>
+      </div>
+      <p id="error" role="alert"></p>
+      <section class="next-step">
+        <div>
+          <p class="eyebrow">THEN CONNECT AN AGENT</p>
+          <h2>“Add coffee and bananas. Mark the milk bought.”</h2>
+          <p id="native-status">Checking browser tool support…</p>
+        </div>
+        <a
+          class="button-link"
+          href="https://www.signett.ai/tutorials/shopping-list#connect-a-real-agent"
+          >Connect an agent <span aria-hidden="true">↗</span></a
+        >
+      </section>
+      <footer>
+        Plain JavaScript · Three tools · One small app
+        <a href="https://www.signett.ai/tutorials/shopping-list"
+          >How it works ↗</a
+        >
+      </footer>
+    </main>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
