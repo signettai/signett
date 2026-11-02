@@ -4,6 +4,26 @@ Signett makes website capabilities reliable and agent-ready through WebMCP. This
 
 [Read the Signett documentation](https://signett.ai).
 
+## Build something useful in five minutes
+
+Start with a shopping list that people and agents can both use. The standalone
+starter installs the published `signett` package, saves groceries in the browser, and
+includes a sample tool call that needs no API key.
+
+```sh
+npx --yes degit@3.10.1 signettai/signett/fixtures/shopping-list my-list
+cd my-list
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:5173` and click **Run sample tool call**. Milk, eggs, and bread
+appear in the list. Refresh to see that they were saved. The sample uses Signett's
+deterministic test harness; it does not run a model.
+
+[Follow the tutorial](https://www.signett.ai/tutorials/shopping-list) to connect a
+[real Chrome agent](https://chromewebstore.google.com/detail/signett-agent/eehffaaooiogcnfdombifkbflnmnhfbb), change the tools, and test invalid input.
+
 ## Repository map
 
 - `packages/webmcp` — the flagship `signett` package, including the SDK and CLI entry point

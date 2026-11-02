@@ -28,13 +28,13 @@ Codex CLI. The first agent run downloads its pinned Node.js 24 runner from npm.
 
 These lanes prove different boundaries:
 
-| Lane                  | Command                          | Model? | Evidence                                                                        |
-| --------------------- | -------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| Lane                  | Command                          | Model? | Evidence                                                                         |
+| --------------------- | -------------------------------- | ------ | -------------------------------------------------------------------------------- |
 | Deterministic browser | `npm run test:reference`         | No     | React lifecycle, Signett controls, HTTP, Express policy, and database assertions |
-| Native browser        | `npm run test:reference:native`  | No     | Native Chrome discovery and invocation plus one verified database effect        |
+| Native browser        | `npm run test:reference:native`  | No     | Native Chrome discovery and invocation plus one verified database effect         |
 | Real-agent smoke      | `npm run test:agent -- --task=…` | Yes    | One model run joined to Signett lifecycle and an application oracle              |
-| Repeated evaluation   | `npm run eval -- …`              | Yes    | Versioned Trial Evidence and oracle-graded JSON/Markdown Reports                |
-| Change check          | `signett check … --against …`     | No     | Per-Case regression verdict against a reviewed Report                           |
+| Repeated evaluation   | `npm run eval -- …`              | Yes    | Versioned Trial Evidence and oracle-graded JSON/Markdown Reports                 |
+| Change check          | `signett check … --against …`    | No     | Per-Case regression verdict against a reviewed Report                            |
 
 All runs operate only on the vendored application's seeded local test database. The
 test and native lanes reset that fixture automatically.
@@ -194,6 +194,13 @@ The example uses memory stores because it is a deterministic single-page fixture
 Express backend independently keeps a durable operation record, returns an existing
 result for an identical retry, and rejects conflicting reuse of an operation ID. A
 production application should use storage whose durability matches its effect.
+
+The memory adapters come from `signett/testing` and are for tests and examples.
+For browser coordination that survives reload, see `IndexedDbIdempotencyStore` from
+`signett/stores` and [idempotency and concurrency](./idempotency-concurrency).
+Browser storage does not replace server-side idempotency, authorization, or durable
+receipts for payments. Use the [production checklist](../production-checklist) when
+adapting this fixture to real effects.
 
 ## 5. Dispose every registration
 
@@ -514,12 +521,12 @@ outcome.
 
 ## Read the implementation
 
-| Source                                                                                                                                                    | What to inspect                                       |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Source                                                                                                                                                  | What to inspect                                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | [`paymentTools.ts`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/src/webmcp/paymentTools.ts)                           | Tool definitions, controls, registration, and cleanup |
 | [`PrivateRoutesContainer.tsx`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/src/containers/PrivateRoutesContainer.tsx) | Authenticated React ownership                         |
 | [`webmcp-routes.ts`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/backend/webmcp-routes.ts)                            | Backend context, payment, and authoritative reads     |
-| [`signett-payment.spec.ts`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/cypress/tests/webmcp/signett-payment.spec.ts)   | End-to-end safety assertions                          |
+| [`signett-payment.spec.ts`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/cypress/tests/webmcp/signett-payment.spec.ts) | End-to-end safety assertions                          |
 | [`nativeWebMcpSmoke.mjs`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/scripts/nativeWebMcpSmoke.mjs)                  | Native Chrome discovery and invocation                |
 | [`eval/cases.mjs`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/eval/cases.mjs)                                        | Reusable intents, expectations, and safety properties |
 | [`eval/oracle.mjs`](https://github.com/signettai/signett/blob/main/fixtures/cypress-realworld-app/eval/oracle.mjs)                                      | Database snapshots and authoritative Trial grades     |

@@ -25,7 +25,7 @@ page. Signett does not create a parallel tool catalogue.
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Browser agent**         | Any WebMCP-capable agent can discover and invoke the tools exposed by the current page.                                                                       |
 | **Signett Explorer**      | The Chrome side-panel agent and page Inspector provide interactive discovery, invocation, and lifecycle inspection during development.                        |
-| **Signett Headless Eval** | Codex or another agentic harness can drive the same tools in headless Chrome while `@signett/eval` records evidence, grades outcomes, and checks regressions. |
+| **Signett Headless Eval** | Codex or another agentic harness can drive the same tools in headless Chrome while `signett/eval` records evidence, grades outcomes, and checks regressions. |
 
 The agent or harness owns planning, sequencing, and parallelism. Signett owns the
 interface boundary between the agent call and the application function.

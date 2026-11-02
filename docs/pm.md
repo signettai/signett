@@ -7,7 +7,7 @@ frozen.
 
 |   # | Status   | Work item                      | Delivered outcome                                                                                                                                                     |
 | --: | -------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|   1 | Deferred | Publish a real release         | Publish only after local API and reference integrations settle.                                                                                                       |
+|   1 | Done     | Reconcile the published alpha  | `signett@0.1.2` includes the SDK, CLI, and evaluation subpaths. Public docs use that single package.                                                                  |
 |   2 | Done     | Agent-legible failures         | Field-level capped validation messages and coded tool errors cross the native boundary.                                                                               |
 |   3 | Resolved | Agent arrives after page load  | Native WebMCP owns `modelContext` from document creation; late agents see registered tools. Late extension/polyfill bridges are injected explicitly, without polling. |
 |   4 | Done     | React binding                  | Race-safe `useSignettTool` with status, error state, and explicit closure dependencies.                                                                               |
@@ -36,3 +36,11 @@ frozen.
 |        4 | Next   | Harden the Inspector from usage  | Add value capture only if developers request it, and only behind explicit redaction/consent.                                                            |
 |        5 | Next   | Release candidate                | Freeze the small proven surface, write migration/stability notes, then publish the first alpha.                                                         |
 |        6 | Spec   | Trace observability              | OTLP traces, per-tool latency and error tables, and a Jaeger recipe with no new developer code; see [the observability spec](./specs/observability.md). |
+
+## First-use experience
+
+- The homepage links to the correct coding-agent skill, Chrome Store listing, and useful starter.
+- The shopping-list starter installs `signett@0.1.2` from npm independently of the monorepo.
+- Its sample tool call validates input, changes browser-owned state, and verifies the result without a model.
+- Troubleshooting covers unsupported browsers, server rendering, lifecycle, and CLI setup.
+- The next validation is an external developer completing the starter and adapting one tool without help.

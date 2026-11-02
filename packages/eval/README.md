@@ -2,6 +2,10 @@
 
 Portable, application-owned evaluations for agent-ready websites.
 
+This directory is the modular implementation in the monorepo. npm consumers install
+`signett`, which bundles this runtime; a separately published `@signett/eval` package
+is not required.
+
 The format uses four precise terms:
 
 - A **Case** is one versioned user intent with expectations and budgets.
@@ -12,7 +16,7 @@ The format uses four precise terms:
 Application, browser, agent, oracle, and fault adapters keep the runner independent of any particular browser or model provider.
 
 ```ts
-import { defineCase, defineSuite } from "@signett/eval";
+import { defineCase, defineSuite } from "signett/eval";
 
 const suite = defineSuite({
   id: "checkout",
@@ -46,7 +50,7 @@ WebMCP inventory, gives a prompt and those tools to a Chat Completions-compatibl
 model, and records bounded evidence:
 
 ```bash
-npm install --save-dev @signett/eval
+npm install signett
 
 npx signett agent \
   --url http://127.0.0.1:3000 \
@@ -59,7 +63,7 @@ npx signett agent \
 For repeatable tasks, define an application-owned suite:
 
 ```js
-import { defineAgentTestSuite } from "@signett/eval/agent";
+import { defineAgentTestSuite } from "signett/agent";
 
 export default defineAgentTestSuite({
   schemaVersion: 1,
@@ -97,7 +101,7 @@ npx signett agent ./signett.agent.mjs --trials 5
 ```
 
 The Chrome extension remains a separate interactive UI. It is not installed by
-`@signett/eval`.
+`signett`.
 
 For a guided setup, authoritative oracle example, automation strategy, and
 troubleshooting, follow the

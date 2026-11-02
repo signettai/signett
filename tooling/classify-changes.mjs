@@ -69,7 +69,13 @@ export function classifyFiles(files) {
     docs:
       all ||
       sdkSource ||
-      matches(changed, "docs/", "packages/webmcp/README.md", "README.md"),
+      matches(
+        changed,
+        "docs/",
+        "fixtures/shopping-list/",
+        "packages/webmcp/README.md",
+        "README.md",
+      ),
     integrations:
       all ||
       matches(

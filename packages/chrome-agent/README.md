@@ -10,7 +10,17 @@ the page's WebMCP interface, the run makes that gap visible.
 See the [Signett documentation](https://signett.ai) for SDK guides, production
 controls, testing workflows, and API reference.
 
-## Build and load it
+## Install
+
+[Install Signett Agent from the Chrome Web Store](https://chromewebstore.google.com/detail/signett-agent/eehffaaooiogcnfdombifkbflnmnhfbb).
+The published extension is the quickest way to start. Open the
+[shopping-list starter](https://www.signett.ai/tutorials/shopping-list) for a small
+working app, then use its **Connect a real agent** instructions.
+
+Real model calls require a provider and API key configured in Settings. The extension
+does not enable native WebMCP by itself; the target page also needs browser support.
+
+## Build from source
 
 ```sh
 npm run build:chrome-agent
@@ -70,7 +80,7 @@ each chat and sent to the selected model provider with the conversation.
 Remote endpoints must use HTTPS. Plain HTTP is accepted only for local loopback providers.
 See [PRIVACY.md](./PRIVACY.md) for the complete disclosure.
 
-## Make an alpha available
+## Maintainer packaging
 
 Build the Chrome Web Store-ready archive:
 
@@ -85,8 +95,8 @@ For a challenge demo, distribute the ZIP with a GitHub release and tell testers 
 it and use **Load unpacked**. Chrome does not provide normal one-click installation for a
 ZIP outside the Chrome Web Store.
 
-For an installable alpha with automatic updates, create a Chrome Web Store developer
-account and an **Unlisted** item, then:
+For a new Chrome Web Store item, use the submission checklist below. The existing
+Signett Agent listing above is already published; submit versioned updates there.
 
 1. Upload the generated ZIP.
 2. Use “Inspect and invoke the WebMCP tools exposed by the active page” as the single
