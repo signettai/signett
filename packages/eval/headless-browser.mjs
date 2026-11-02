@@ -148,7 +148,16 @@ export class HeadlessWebMcpPage {
         registry.set(${JSON.stringify(callId)}, controller);
         const timeout = setTimeout(() => controller.abort(new DOMException("Tool call timed out.", "TimeoutError")), ${timeoutMs});
         try {
-          const value = await context.executeTool(tool, ${JSON.stringify(JSON.stringify(input ?? {}))}, { signal: controller.signal });
+          const input = ${JSON.stringify(input ?? {})};
+          let value;
+          try {
+            value = await context.executeTool(tool, input, { signal: controller.signal });
+          } catch (error) {
+            // Older Chrome previews parse JSON strings before invoking the tool.
+            // Retry only that input-conversion failure, never an application error.
+            if (!String(error?.message).startsWith("Failed to parse input")) throw error;
+            value = await context.executeTool(tool, JSON.stringify(input), { signal: controller.signal });
+          }
           return { ok: true, value: value === undefined ? null : JSON.parse(JSON.stringify(value)) };
         } catch (error) {
           return { ok: false, error: {
