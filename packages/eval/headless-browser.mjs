@@ -148,7 +148,7 @@ export class HeadlessWebMcpPage {
         registry.set(${JSON.stringify(callId)}, controller);
         const timeout = setTimeout(() => controller.abort(new DOMException("Tool call timed out.", "TimeoutError")), ${timeoutMs});
         try {
-          const input = ${JSON.stringify(input ?? {})};
+          const input = JSON.parse(${JSON.stringify(JSON.stringify(input ?? {}))});
           let value;
           try {
             value = await context.executeTool(tool, input, { signal: controller.signal });

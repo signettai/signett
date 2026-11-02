@@ -60,6 +60,19 @@ test("supports older Chrome previews that require serialized arguments", async (
   assert.equal(calls, 2);
 });
 
+test("preserves JSON properties when transferring arguments into the page", async () => {
+  const input = JSON.parse(
+    '{"__proto__":{"label":"grocery"},"items":["Milk"]}',
+  );
+  const page = createPage(async (_tool, received) => {
+    assert.equal(Object.hasOwn(received, "__proto__"), true);
+    return received;
+  });
+
+  const result = await page.invoke({ ...call, arguments: input });
+  assert.equal(JSON.stringify(result), JSON.stringify(input));
+});
+
 test("does not retry an application failure after a tool may have changed state", async () => {
   let effects = 0;
   const page = createPage(async () => {
