@@ -46,6 +46,6 @@
   ],
   "dependencies": {
     "@cfworker/json-schema": "^4.1.1",
-    "ws": "^8.18.3"
+    "ws": "^8.22.1"
   }
 }
